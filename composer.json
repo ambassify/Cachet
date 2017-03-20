@@ -20,6 +20,9 @@
     ],
     "require": {
         "php": ">=5.5.9",
+        "ext-apcu": "*",
+        "ext-gd": "*",
+        "ext-mcrypt": "*",
         "ext-xml": "*",
         "laravel/framework": "5.2.39",
         "alt-three/badger": "^3.1",

@@ -1,0 +1,30 @@
+{
+    "name": "ambassify/status",
+    "description": "Status of various components in the Ambassify cloud",
+    "repository": "https://github.com/ambassify/status",
+    "buildpacks": [ {
+        "url": "heroku/php"
+    } ],
+    "env": {
+        "WEB_CONCURRENCY": { "value": "24", "description": "more concurrenct connections" },
+        "APP_ENV": "production",
+        "APP_DEBUG": "false",
+        "APP_LOG": "errorlog",
+        "APP_URL": "https://status.ambassify.eu/",
+        "APP_KEY": { "required": true, "description": "heroku config:set APP_KEY=$(php artisan --no-ansi key:generate --show)" },
+
+        "AUTH_USER": { "required": true },
+        "AUTH_PASSWORD": { "required": true },
+
+        "DB_DRIVER": "mysql",
+        "DB_HOST": { "required": true },
+        "DB_DATABASE": { "required": true },
+        "DB_USERNAME": { "required": true },
+        "DB_PASSWORD": { "required": true },
+
+        "CACHE_DRIVER": "apc",
+        "SESSION_DRIVER": "apc",
+        "QUEUE_DRIVER": "sync",
+        "CACHET_EMOJI": "false"
+    }
+}
