@@ -36,6 +36,7 @@ class MySqlRepository extends AbstractMetricRepository implements MetricInterfac
     {
         $dateTime = (new Date())->sub(new DateInterval('PT'.$hour.'H'))->sub(new DateInterval('PT'.$minute.'M'));
         $timeInterval = $dateTime->format('YmdHi');
+        $since = $dateTime->format('Y-m-d H:i');
 
         if (!isset($metric->calc_type) || $metric->calc_type == Metric::CALC_SUM) {
             $queryType = 'SUM(mp.`value` * mp.`counter`) AS `value`';
@@ -44,10 +45,10 @@ class MySqlRepository extends AbstractMetricRepository implements MetricInterfac
         }
 
         $value = 0;
-
-        $points = DB::select("SELECT {$queryType} FROM {$this->getTableName()} m INNER JOIN metric_points mp ON m.id = mp.metric_id WHERE m.id = :metricId AND DATE_FORMAT(mp.`created_at`, '%Y%m%d%H%i') = :timeInterval GROUP BY HOUR(mp.`created_at`), MINUTE(mp.`created_at`)", [
+        $points = DB::select("SELECT {$queryType} FROM metric_points mp WHERE mp.metric_id = :metricId AND mp.`created_at` >= :since AND DATE_FORMAT(mp.`created_at`, '%Y%m%d%H%i') = :timeInterval GROUP BY HOUR(mp.`created_at`), MINUTE(mp.`created_at`)", [
             'metricId'     => $metric->id,
             'timeInterval' => $timeInterval,
+            'since'        => $since,
         ]);
 
         if (isset($points[0]) && !($value = $points[0]->value)) {
@@ -73,6 +74,7 @@ class MySqlRepository extends AbstractMetricRepository implements MetricInterfac
     {
         $dateTime = (new Date())->sub(new DateInterval('PT'.$hour.'H'));
         $hourInterval = $dateTime->format('YmdH');
+        $since = $dateTime->format('Y-m-d H:00');
 
         if (!isset($metric->calc_type) || $metric->calc_type == Metric::CALC_SUM) {
             $queryType = 'SUM(mp.`value` * mp.`counter`) AS `value`';
@@ -81,10 +83,10 @@ class MySqlRepository extends AbstractMetricRepository implements MetricInterfac
         }
 
         $value = 0;
-
-        $points = DB::select("SELECT {$queryType} FROM {$this->getTableName()} m INNER JOIN metric_points mp ON m.id = mp.metric_id WHERE m.id = :metricId AND DATE_FORMAT(mp.`created_at`, '%Y%m%d%H') = :hourInterval GROUP BY HOUR(mp.`created_at`)", [
+        $points = DB::select("SELECT {$queryType} FROM metric_points mp WHERE mp.metric_id = :metricId AND mp.`created_at` >= :since AND DATE_FORMAT(mp.`created_at`, '%Y%m%d%H') = :hourInterval GROUP BY HOUR(mp.`created_at`)", [
             'metricId'     => $metric->id,
             'hourInterval' => $hourInterval,
+            'since'        => $since
         ]);
 
         if (isset($points[0]) && !($value = $points[0]->value)) {
